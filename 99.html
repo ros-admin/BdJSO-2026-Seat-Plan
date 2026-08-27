@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BdJSO Student Cards PDF Generator</title>
+  <title>BdJSO Student Seat Plan PDF </title>
   
   <!-- html2pdf.js CDN library for generating PDF directly -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -26,22 +26,7 @@
       margin-bottom: 20px;
     }
 
-    .btn-download {
-      background-color: #008CBA;
-      color: white;
-      padding: 12px 24px;
-      font-size: 16px;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .btn-download:hover {
-      background-color: #005f73;
-    }
-
+    
     /* Print Paper Styles */
     #pdf-container {
       width: 210mm;
@@ -127,10 +112,6 @@
   </style>
 </head>
 <body>
-
-  <div class="controls">
-    <button class="btn-download" onclick="generatePDF()">Download All Cards as PDF</button>
-  </div>
 
   <div id="pdf-container"></div>
 
