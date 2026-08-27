@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BdJSO Student Cards PDF Generator</title>
+  
+  <!-- html2pdf.js CDN library for generating PDF directly -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, 'Siyam Rupali', sans-serif;
+      background-color: #f4f4f4;
+      padding: 20px;
+    }
+
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-download {
+      background-color: #008CBA;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-download:hover {
+      background-color: #005f73;
+    }
+
+    /* Print Paper Styles */
+    #pdf-container {
+      width: 210mm;
+      margin: 0 auto;
+    }
+
+    .page {
+      width: 210mm;
+      height: 297mm;
+      padding: 12mm 10mm;
+      background-color: white;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      gap: 10px;
+      page-break-after: always;
+      break-after: page;
+      box-sizing: border-box;
+    }
+
+    /* Box Styles */
+    .student-box {
+      background-color: #ffffff; /* White background */
+      border: 2px solid #000000;  /* Black border */
+      border-radius: 6px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .box-header {
+      width: 100%;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 4px;
+      margin-bottom: 4px;
+    }
+
+    .logo {
+      height: 35px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .user-id {
+      font-size: 22px;
+      font-weight: bold;
+      color: #000;
+      margin: 4px 0;
+    }
+
+    .student-name {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .details {
+      font-size: 12px;
+      color: #444;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #eee;
+      padding-top: 4px;
+    }
+
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+      }
+      .controls {
+        display: none;
+      }
+      #pdf-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="btn-download" onclick="generatePDF()">Download All Cards as PDF</button>
+  </div>
+
+  <div id="pdf-container"></div>
+
+  <script>
+    async function loadAndRender() {
+      try {
+        // Fetch JSON data from /students.json
+        const response = await fetch('/students.json');
+        const data = await response.json();
+        const students = data.students;
+
+        // Clean room string numbers (remove line breaks/spaces if any)
+        students.forEach(s => {
+          if (s.room) s.room = s.room.trim();
+        });
+
+        // Group sorting logic:
+        // 1st Priority: Room
+        // 2nd Priority: Category
+        // 3rd Priority: ID (Serial wise)
+        students.sort((a, b) => {
+          if (a.room !== b.room) {
+            return a.room.localeCompare(b.room, undefined, { numeric: true });
+          }
+          if (a.category !== b.category) {
+            return a.category.localeCompare(b.category);
+          }
+          return a.id.localeCompare(b.id, undefined, { numeric: true });
+        });
+
+        // Split into groups of same Room + Category
+        let groups = [];
+        let currentGroup = [];
+        
+        students.forEach((student, index) => {
+          if (index === 0) {
+            currentGroup.push(student);
+          } else {
+            let prev = students[index - 1];
+            if (student.room === prev.room && student.category === prev.category) {
+              currentGroup.push(student);
+            } else {
+              groups.push(currentGroup);
+              currentGroup = [student];
+            }
+          }
+        });
+        if (currentGroup.length > 0) groups.push(currentGroup);
+
+        // Paginate groups (10 students per page max)
+        const container = document.getElementById('pdf-container');
+        container.innerHTML = '';
+
+        groups.forEach(group => {
+          for (let i = 0; i < group.length; i += 10) {
+            const pageStudents = group.slice(i, i + 10);
+            
+            const pageDiv = document.createElement('div');
+            pageDiv.className = 'page';
+
+            pageStudents.forEach(student => {
+              const box = document.createElement('div');
+              box.className = 'student-box';
+              box.innerHTML = `
+                <div class="box-header">
+                  <img src="/BdJSO Logo.png" alt="BdJSO Logo" class="logo" onerror="this.style.display='none'">
+                </div>
+                <div class="user-id">${student.id}</div>
+                <div class="student-name">${student.name}</div>
+                <div class="details">
+                  <span><strong>Category:</strong> ${student.category}</span>
+                  <span><strong>Room:</strong> ${student.room}</span>
+                </div>
+              `;
+              pageDiv.appendChild(box);
+            });
+
+            container.appendChild(pageDiv);
+          }
+        });
+
+      } catch (error) {
+        console.error('JSON লোড করতে সমস্যা হয়েছে:', error);
+      }
+    }
+
+    function generatePDF() {
+      const element = document.getElementById('pdf-container');
+      const opt = {
+        margin:       0,
+        filename:     'BdJSO_Student_Cards.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save();
+    }
+
+    // Initialize rendering on load
+    window.onload = loadAndRender;
+  </script>
+</body>
+</html>
