@@ -119,7 +119,7 @@
     async function loadAndRender() {
       try {
         // Fetch JSON data from /students.json
-        const response = await fetch('/students.json');
+        const response = await fetch('/student.json');
         const data = await response.json();
         const students = data.students;
 
@@ -182,6 +182,7 @@
                 <div class="user-id">${student.id}</div>
                 <div class="student-name">${student.name}</div>
                 <div class="details">
+                <span><strong>Category:</strong> ${student.class}</span>
                   <span><strong>Category:</strong> ${student.category}</span>
                   <span><strong>Room:</strong> ${student.room}</span>
                 </div>
