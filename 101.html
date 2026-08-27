@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Card PDF Generator</title>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #1b5e20;
+        }
+
+        /* Container for cards - styled for print/PDF rendering */
+        #pdf-container {
+            width: 210mm; /* A4 Width */
+            background-color: white;
+            padding: 10mm;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6mm;
+            justify-content: flex-start;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        /* Student Card Structure & Design */
+        .student-card {
+            width: 90mm;
+            height: 55mm;
+            border: 2px solid #1b5e20;
+            border-radius: 8px;
+            padding: 4mm 5mm;
+            background: linear-gradient(135deg, #ffffff 0%, #f9fbf9 100%);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .card-header {
+            border-bottom: 1.5px solid #2e7d32;
+            padding-bottom: 2mm;
+            margin-bottom: 1mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header .title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1b5e20;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-header .id-badge {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid #a5d6a7;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5mm;
+            flex-grow: 1;
+            justify-content: center;
+        }
+
+        .student-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            margin-bottom: 1mm;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12.5px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: #1b5e20;
+        }
+
+        .card-footer {
+            border-top: 1px dashed #ccc;
+            padding-top: 1.5mm;
+            margin-top: 1mm;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn" onclick="generatePDF()">PDF ডাউনলোড করুন</button>
+    </div>
+
+    <div id="pdf-container">
+        <!-- Student cards dynamically rendered here -->
+    </div>
+
+    <script>
+        // Fetch student data from /student.json
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/student.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP error! status: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const students = data.students || data;
+                    renderStudents(students);
+                })
+                .catch(error => {
+                    console.error("Error loading student data:", error);
+                });
+        });
+
+        // Parse numerical value from Class string for accurate sorting
+        function getClassNumber(classStr) {
+            if (!classStr || classStr.trim() === "" || classStr.includes("****")) {
+                return 999999; // Blank/empty class goes to the end
+            }
+            const match = classStr.match(/\d+/);
+            if (match) {
+                return parseInt(match[0], 10);
+            }
+            return 999990;
+        }
+
+        function renderStudents(students) {
+            // Sorting Logic:
+            // 1. Class numerical order (Class 3 -> Class 4 -> Class 5 ... -> Blank Class)
+            // 2. Name / Username alphabetical order within the same class
+            const sortedStudents = [...students].sort((a, b) => {
+                const classA = getClassNumber(a.class);
+                const classB = getClassNumber(b.class);
+
+                if (classA !== classB) {
+                    return classA - classB;
+                }
+
+                // If class is the same, sort by name/username
+                const nameA = (a.name || a.username || "").toLowerCase();
+                const nameB = (b.name || b.username || "").toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            const container = document.getElementById('pdf-container');
+            container.innerHTML = '';
+
+            sortedStudents.forEach(student => {
+                const card = document.createElement('div');
+                card.className = 'student-card';
+
+                // Display Class value; show "****" if blank/null/undefined
+                const displayClass = (student.class && student.class.trim() !== "") ? student.class : "****";
+                const displayCategory = student.category || "N/A";
+                const displayRoom = student.room || "N/A";
+                const displayFloor = student.floor || "N/A";
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="title">STUDENT CARD</span>
+                        <span class="id-badge">ID: ${student.id || ''}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="student-name">${student.name || student.username || ''}</div>
+                        <div class="info-row">
+                            <span class="info-label">Class:</span>
+                            <span class="info-value">${displayClass}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Category:</span>
+                            <span class="info-value">${displayCategory}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Exam Room:</span>
+                            <span class="info-value">${displayRoom}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span>Floor: ${displayFloor}</span>
+                        <span>Status: Verified</span>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('pdf-container');
+            const opt = {
+                margin:       5,
+                filename:     'Student_Cards.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
