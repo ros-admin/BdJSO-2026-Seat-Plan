@@ -502,13 +502,13 @@
     { "id": "SC00004", "name": "Anik Maitro", "category": "Secondary", "room": "812", "floor": "৮ম তলা" },
     { "id": "SC00008", "name": "Fariya Thasmim Toma", "category": "Secondary", "room": "812", "floor": "৮ম তলা" },
     { "id": "SC00030", "name": "Papiya Akther Eva", "category": "Secondary", "room": "812", "floor": "৮ম তলা" },
-    { "id": "SC00036", "name": "Shaik Ahamed Al Nahin", "category": "Secondary", "room": "812", "floor": "৮ম তলা" }
-    { "id": "701974", "name": "Md. Ahsanul Haque Rahat", "category": "Secondary", "room": "801", "floor": "৮ম তলা" }
-{ "id": "806120", "name": "M. Muztahid Hasan", "category": "Junior", "room": "802", "floor": "৮ম তলা" }
-{ "id": "809845", "name": "Manha Zaman", "category": "Junior", "room": "803", "floor": "৮ম তলা" }
-{ "id": "900317", "name": "Sudipto Roy", "category": "Secondary", "room": "804", "floor": "৮ম তলা" }
-{ "id": "900221", "name": "Arijit Saha", "category": "Junior", "room": "804", "floor": "৮ম তলা" }
-{ "id": "904235", "name": "Marjana Manha", "category": "Junior", "room": "806", "floor": "৮ম তলা" }
+    { "id": "SC00036", "name": "Shaik Ahamed Al Nahin", "category": "Secondary", "room": "812", "floor": "৮ম তলা" },
+    { "id": "701974", "name": "Md. Ahsanul Haque Rahat", "category": "Secondary", "room": "801", "floor": "৮ম তলা" },
+{ "id": "806120", "name": "M. Muztahid Hasan", "category": "Junior", "room": "802", "floor": "৮ম তলা" },
+{ "id": "809845", "name": "Manha Zaman", "category": "Junior", "room": "803", "floor": "৮ম তলা" },
+{ "id": "900317", "name": "Sudipto Roy", "category": "Secondary", "room": "804", "floor": "৮ম তলা" },
+{ "id": "900221", "name": "Arijit Saha", "category": "Junior", "room": "804", "floor": "৮ম তলা" },
+{ "id": "904235", "name": "Marjana Manha", "category": "Junior", "room": "806", "floor": "৮ম তলা" },
 { "id": "911473", "name": "Nahian", "category": "Junior", "room": "811", "floor": "৮ম তলা" }
   ]
 }
