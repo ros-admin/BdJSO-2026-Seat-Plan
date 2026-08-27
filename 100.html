@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Card PDF Generator</title>
+    <!-- html2pdf.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #1b5e20;
+        }
+
+        /* PDF Container */
+        #pdf-container {
+            width: 210mm;
+            background-color: transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* 10 cards per page (2 columns x 5 rows grid on A4) */
+        .pdf-page {
+            width: 210mm;
+            height: 297mm;
+            padding: 10mm 8mm;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 6mm 6mm;
+            page-break-after: always;
+            box-sizing: border-box;
+        }
+
+        .pdf-page:last-child {
+            page-break-after: auto;
+        }
+
+        /* Student Card Structure */
+        .student-card {
+            border: 2px solid #2e7d32;
+            border-radius: 8px;
+            padding: 8px 12px;
+            background: #ffffff;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Logo styling */
+        .card-logo {
+            height: 38px;
+            object-fit: contain;
+            margin-bottom: 2px;
+        }
+
+        /* Dashed Line below Logo */
+        .dashed-line {
+            width: 100%;
+            border-top: 2px dashed #666;
+            margin: 2px 0 4px 0;
+        }
+
+        /* Solid Line above Footer */
+        .solid-line {
+            width: 100%;
+            border-top: 1.5px solid #333;
+            margin: 4px 0 3px 0;
+        }
+
+        /* User ID styling */
+        .card-userid {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1b5e20;
+            text-align: center;
+            letter-spacing: 0.5px;
+            line-height: 1.1;
+        }
+
+        /* Name styling */
+        .card-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #111;
+            text-align: center;
+            line-height: 1.2;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        /* Footer Row: Class | Category | Room */
+        .card-footer-row {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #222;
+            padding: 1px 0;
+        }
+
+        .footer-left {
+            text-align: left;
+            flex: 1;
+        }
+
+        .footer-center {
+            text-align: center;
+            flex: 1;
+        }
+
+        .footer-right {
+            text-align: right;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <button class="btn" onclick="generatePDF()">PDF ডাউনলোড করুন</button>
+    </div>
+
+    <div id="pdf-container">
+        <!-- Student card pages generated dynamically -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/student.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP error! status: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const students = data.students || data;
+                    renderStudents(students);
+                })
+                .catch(error => {
+                    console.error("Error loading student data:", error);
+                });
+        });
+
+        // Numerical sorting for class
+        function getClassNumber(classStr) {
+            if (!classStr || classStr.trim() === "" || classStr.includes("****")) {
+                return 999999;
+            }
+            const match = classStr.match(/\d+/);
+            if (match) {
+                return parseInt(match[0], 10);
+            }
+            return 999990;
+        }
+
+        function renderStudents(students) {
+            // Sorting: Class numerical order -> Name/Username alphabetical order
+            const sortedStudents = [...students].sort((a, b) => {
+                const classA = getClassNumber(a.class);
+                const classB = getClassNumber(b.class);
+
+                if (classA !== classB) {
+                    return classA - classB;
+                }
+
+                const nameA = (a.name || a.username || "").toLowerCase();
+                const nameB = (b.name || b.username || "").toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+
+            const container = document.getElementById('pdf-container');
+            container.innerHTML = '';
+
+            // Render 10 cards per page
+            const pageSize = 10;
+            for (let i = 0; i < sortedStudents.length; i += pageSize) {
+                const pageStudents = sortedStudents.slice(i, i + pageSize);
+                const pageElement = document.createElement('div');
+                pageElement.className = 'pdf-page';
+
+                pageStudents.forEach(student => {
+                    const card = document.createElement('div');
+                    card.className = 'student-card';
+
+                    const displayClass = (student.class && student.class.trim() !== "") ? student.class : "****";
+                    const displayCategory = student.category || "****";
+                    const displayRoom = student.room || student.room_number || student.roomNo || "****";
+                    const displayUserId = student.id || student.userid || student.user_id || student.username || "****";
+                    const displayName = student.name || student.username || "****";
+
+                    card.innerHTML = `
+                        <img class="card-logo" src="/BdJSO Logo.png" alt="BdJSO Logo" />
+                        <div class="dashed-line"></div>
+                        <div class="card-userid">${displayUserId}</div>
+                        <div class="card-name">${displayName}</div>
+                        <div class="solid-line"></div>
+                        <div class="card-footer-row">
+                            <span class="footer-left">${displayClass}</span>
+                            <span class="footer-center">${displayCategory}</span>
+                            <span class="footer-right">${displayRoom}</span>
+                        </div>
+                    `;
+
+                    pageElement.appendChild(card);
+                });
+
+                container.appendChild(pageElement);
+            }
+        }
+
+        function generatePDF() {
+            const element = document.getElementById('pdf-container');
+            const opt = {
+                margin:       0,
+                filename:     'Student_Cards.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+    </script>
+</body>
+</html>
