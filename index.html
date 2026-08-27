@@ -440,11 +440,17 @@
         let seatData = [];
         let currentResultData = null;
 
-        // Fetch student data dynamically from students.json
+        // Fetch student data (ফাইলের নাম student.json নাকি students.json তা নিশ্চিত হয়ে নিন)
         fetch('student.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('নেটওয়ার্ক অথবা ফাইল লোডজনিত সমস্যা');
+                }
+                return response.json();
+            })
             .then(data => {
-                seatData = data.students;
+                // ডাটা Structure নিরাপদ করার জন্য
+                seatData = Array.isArray(data) ? data : (data.students || []);
             })
             .catch(error => {
                 console.error('JSON ফাইল লোড করতে সমস্যা হয়েছে:', error);
@@ -466,15 +472,18 @@
                 return;
             }
 
-            const foundData = seatData.find(item => item.id.toUpperCase() === input);
+            // Data matching check
+            const foundData = seatData.find(item => {
+                const idValue = item.id || item.username || item.userID;
+                return idValue && idValue.toString().toUpperCase() === input;
+            });
 
             if (foundData) {
                 currentResultData = foundData;
-                document.getElementById('resUser').innerText = foundData.id;
-                document.getElementById('resName').innerText = foundData.name;
-                document.getElementById('resCategory').innerText = foundData.category;
-                document.getElementById('resFloor').innerText = foundData.floor;
-                document.getElementById('resRoom').innerText = foundData.room;
+                document.getElementById('resUser').innerText = foundData.id || foundData.username || input;
+                document.getElementById('resName').innerText = foundData.name || 'N/A';
+                document.getElementById('resCategory').innerText = foundData.category || 'N/A';
+                document.getElementById('resRoom').innerText = foundData.room || 'N/A';
 
                 resultCard.style.display = 'block';
                 downloadBtn.style.display = 'inline-block';
@@ -483,44 +492,42 @@
             }
         }
 
-        // Generate and download image using HTML5 Canvas API
+        // Image generator (Canvas API)
         function downloadSeatPlanImage() {
             if (!currentResultData) return;
 
             const canvas = document.getElementById('exportCanvas');
             const ctx = canvas.getContext('2d');
 
-            // Set canvas size
             canvas.width = 800;
             canvas.height = 550;
 
-            // Background Fill
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Outer Border Box (Solid Border)
-            ctx.setLineDash([]); // নিশ্চিত করছি বাইরের বর্ডার যেন সলিড থাকে
+            ctx.setLineDash([]);
             ctx.strokeStyle = '#0066cc';
             ctx.lineWidth = 10;
             ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
 
-            // Draw Logo safely
             const logoImg = document.getElementById('mainLogoImg');
             const logoWidth = 240;
             const logoHeight = (logoImg.naturalHeight / logoImg.naturalWidth) * logoWidth || 100;
             const logoX = (canvas.width - logoWidth) / 2;
             const logoY = 35;
 
-            ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+            try {
+                ctx.drawImage(logoImg, logoX, logoY, logoWidth, logoHeight);
+            } catch(e) {
+                console.log("Logo rendering skipped due to load state", e);
+            }
 
-            // Title Settings
             ctx.fillStyle = '#004080';
             ctx.font = 'bold 30px "Hind Siliguri", sans-serif';
             ctx.textAlign = 'center';
             const titleY = logoY + logoHeight + 50; 
             ctx.fillText('জাতীয় পর্বের আসন বিন্যাস', canvas.width / 2, titleY);
 
-            // Inner Card Box (Dashed Border)
             const boxX = 40;
             const boxY = titleY + 25;
             const boxWidth = canvas.width - 80;
@@ -529,14 +536,12 @@
             ctx.fillStyle = '#f0f8ff';
             ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
             
-            // বর্ডার কাটা কাটা করার পরিবর্তনসমূহ
             ctx.strokeStyle = '#0066cc';
             ctx.lineWidth = 2;
-            ctx.setLineDash([6, 6]); // ৬ পিক্সেল দাগ এবং ৬ পিক্সেল ফাঁকা জায়গা তৈরি করবে
+            ctx.setLineDash([6, 6]);
             ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-            ctx.setLineDash([]); // পরবর্তী অন্য কোনো ড্রয়িং ড্যাশড হওয়া আটকাবে
+            ctx.setLineDash([]);
 
-            // Details Text Settings
             ctx.font = 'bold 24px "Hind Siliguri", sans-serif';
             ctx.textAlign = 'left';
 
@@ -545,7 +550,7 @@
             const lineSpacing = 48;
 
             const details = [
-                { label: 'ইউজার নেম: ', val: currentResultData.id },
+                { label: 'ইউজার নেম: ', val: currentResultData.id || currentResultData.username },
                 { label: 'শিক্ষার্থীর নাম: ', val: currentResultData.name },
                 { label: 'ক্যাটাগরি: ', val: currentResultData.category },
                 { label: 'রুম নাম্বার: ', val: currentResultData.room }
@@ -557,14 +562,13 @@
 
                 const labelWidth = ctx.measureText(item.label).width;
                 ctx.fillStyle = '#0066cc';
-                ctx.fillText(item.val, startX + labelWidth, currentY);
+                ctx.fillText(item.val || '', startX + labelWidth, currentY);
 
                 currentY += lineSpacing;
             });
 
-            // Trigger Image Download
             const link = document.createElement('a');
-            link.download = `Seat_Plan_${currentResultData.id}.png`;
+            link.download = `Seat_Plan_${currentResultData.id || 'download'}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
         }
