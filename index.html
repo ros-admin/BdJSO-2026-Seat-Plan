@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>জাতীয় পর্বের আসন বিন্যাস - ১২তম BdJSO ২০২৬</title>
+    
+    <!-- Font Awesome CDN for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts (Hind Siliguri) -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #004080;
+            --accent-color: #ff6600;
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+        }
+
+        /* Header Section */
+        header {
+            text-align: center;
+            background: var(--card-bg);
+            padding: 25px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .main-logo {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            background: #eef5ff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .venue, .date {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .venue a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .venue a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        /* Blur Faded Divider */
+        .faded-divider {
+            height: 2px;
+            background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,102,204,0.4) 50%, rgba(0,0,0,0) 100%);
+            margin: 30px 0;
+            filter: blur(1px);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .search-section h2 {
+            font-size: 1.6rem;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .search-section p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-box input {
+            width: 70%;
+            padding: 12px 18px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .search-box button {
+            padding: 12px 25px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .search-box button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Result Display Card */
+        .result-card {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #f0f8ff;
+            border: 2px dashed var(--primary-color);
+            border-radius: 10px;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .result-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+
+        .result-details {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .result-item {
+            display: inline-block;
+        }
+
+        .result-details span {
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .separator {
+            color: #aaa;
+        }
+
+        /* Download PDF Button */
+        .btn-download {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-download:hover {
+            background: #218838;
+        }
+
+        /* Error Box */
+        .error-card {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #fff0f0;
+            border: 1px solid #ffcccc;
+            border-radius: 10px;
+            color: #d9534f;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .error-card a.btn-result {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .fb-contact-link {
+            margin-top: 10px;
+            display: block;
+            color: #3b5998;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Partners Single PNG Banner */
+        .partners-banner-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .sponsor-banner-img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            background: #1a1a1a;
+            color: #ffffff;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-content a {
+            color: #4da6ff;
+            text-decoration: none;
+        }
+
+        .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 768px) {
+            .info-grid {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box input, .search-box button {
+                width: 100%;
+            }
+
+            /* 3 Details in 3 Lines on Mobile */
+            .result-details {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .separator {
+                display: none; /* Hide vertical bar on mobile */
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <img src="https://bdjso.org/wp-content/uploads/2026/08/bdjso_logo_2026-01-1-scaled.png" alt="BdJSO Logo" class="main-logo">
+            <h1 class="title">জাতীয় পর্ব</h1>
+            
+            <div class="info-grid">
+                <div class="venue">
+                    <i class="fa-solid fa-location-dot"></i> ভেন্যু: 
+                    <a href="https://maps.app.goo.gl/8ogKX8A5xG9s4X9u5" target="_blank">
+                        ইন্টারন্যাশনাল ইউনিভার্সিটি অব বিজনেস এগ্রিকালচার অ্যান্ড টেকনোলজি (IUBAT), ঢাকা
+                    </a>
+                </div>
+                <div class="date">
+                    <i class="fa-solid fa-calendar-days"></i> তারিখ: ২৮ আগস্ট, ২০২৬; শুক্রবার । সকাল ০৮ টা
+                </div>
+            </div>
+        </header>
+
+        <div class="faded-divider"></div>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <h2>জাতীয় পর্বের আসন বিন্যাস</h2>
+            <p>নিচের বক্সে ৬ ডিজিটের ইউজারনেম লিখুন</p>
+            
+            <div class="search-box">
+                <input type="text" id="usernameInput" placeholder="যেমন: 900009">
+                <button onclick="searchSeat()"><i class="fa-solid fa-magnifying-glass"></i> খুঁজুন</button>
+            </div>
+
+            <!-- Dynamic Result Card -->
+            <div id="resultCard" class="result-card">
+                <h3><i class="fa-solid fa-circle-check"></i> আসন বিন্যাস পাওয়া গেছে!</h3>
+                <div class="result-details">
+                    <div class="result-item">ইউজারনেম: <span id="resUser"></span></div>
+                    <span class="separator">|</span>
+                    <div class="result-item">ফ্লোর: <span id="resFloor"></span></div>
+                    <span class="separator">|</span>
+                    <div class="result-item">রুম নাম্বার: <span id="resRoom"></span></div>
+                </div>
+            </div>
+
+            <!-- Error Card -->
+            <div id="errorCard" class="error-card">
+                <p><i class="fa-solid fa-triangle-exclamation"></i> দুঃখিত, কোন তথ্য খুঁজে পাওয়া যাচ্ছে না।</p>
+                <div style="margin-top: 10px;">
+                    আপনি কি জাতীয় পর্বের জন্য নির্বাচিত হয়েছেন? <br>
+                    <a href="https://bdjso.org/results" target="_blank" class="btn-result"><i class="fa-solid fa-square-poll-vertical"></i> ফলাফল দেখুন</a>
+                </div>
+                <a href="https://facebook.com/bdjso" target="_blank" class="fb-contact-link">
+                    অন্যথায় BdJSO এর ফেসবুক পেজে যোগাযোগ করো <i class="fa-brands fa-facebook"></i>
+                </a>
+            </div>
+
+            <br>
+            <!-- Download Button -->
+            <a href="/Seat Plan 2026.pdf" download class="btn-download">
+                <i class="fa-solid fa-file-pdf"></i> পুরো আসন বিন্যাস ডাউনলোড করুন
+            </a>
+        </section>
+
+        <!-- Partners Banner (Single PNG) -->
+        <section class="partners-banner-section">
+            <img src="/Sponsor.png" alt="Sponsors and Partners Banner" class="sponsor-banner-img">
+        </section>
+
+        <div class="faded-divider"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div>© 2026 Bangladesh Junior Science Olympiad (BdJSO). All rights reserved.</div>
+            <div>Design by, <a href="https://facebook.com/utsabsarker.arup" target="_blank">UTSAB SARKER</a></div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        const seatData = [
+            // Room 801
+            ...["600119","402458","601743","813586","602452","607952","901048","613643","801769","404122","601911","900021","602726","701150","901415","614525","802772","406048","602131","900109","605144","800024","901766","700302","803332","507488","602226","900181","605285","800139","901863","700912","804174","508171","604167","900581","607362","800178","902148","700982","807218","601163","604393","900582","612570","800276","902200","701702","808736","602426","607584","900994","612844","800483","902397","702816"].map(id => ({id, room: "801", floor: "৮ম তলা"})),
+            
+            // Room 802
+            ...["902931","703685","800809","904016","800356","803800","904532","801928","903376","704663","801123","904020","800979","804009","904745","801986","903385","705069","801880","904078","801164","804365","904819","802004","903744","800096","802814","904136","801355","805764","905027","802035","903781","800123","802979","904150","801503","805864","905320","802180","903911","800220","803022","904207","801524","806137","905672","802190","903994","800318","803621","904256","801599","808250","905702","802232"].map(id => ({id, room: "802", floor: "৮ম তলা"})),
+
+            // Room 803
+            ...["905812","802330","809104","907180","804210","900010","908748","807526","905815","802352","809122","907201","804528","900018","908751","807994","905904","802386","811398","907397","804644","900024","909000","808054","905971","802691","812022","907760","804940","900108","909714","808791","906503","802962","812775","907927","805018","900137","910038","809623","906514","803681","813527","908347","805716","900187","910049","809866","906966","803728","813696","908427","806639","900219","910381","811310"].map(id => ({id, room: "803", floor: "৮ম তলা"})),
+
+            // Room 804
+            ...["910489","811623","900225","900112","900705","900563","901212","900802","911416","812130","900327","900151","900716","900571","901272","900906","812271","900361","900362","900861","900624","901290","900963","812305","900392","900373","900911","900629","901680","901084","812357","900449","900375","900914","900655","901693","901128","814051","900575","900428","900954","900708","901706","901198","900053","900594","900509","901081","900783","901723","901337"].map(id => ({id, room: "804", floor: "৮ম তলা"})),
+
+            // Room 805
+            ...["901350","902031","901781","902676","902290","903406","903399","903719","901369","902294","901788","902843","902354","903435","903453","903721","901390","902436","901834","902849","902689","903442","903484","903776","901414","902485","901858","902883","902919","903452","903993","903806","901613","902516","901912","902898","903091","903524","904000","903820","901659","902578","901990","903313","903289","903592","904173","903874","901707","902619","902130","903372","903395","903680","904183","903925"].map(id => ({id, room: "805", floor: "৮ম তলা"})),
+
+            // Room 806
+            ...["904205","903954","904957","904224","905563","904668","906450","905178","904316","903992","905079","904229","905665","904673","906594","905313","904328","904080","905166","904271","905841","904801","906697","905481","904633","904085","905218","904351","906047","904807","907067","905569","904711","904116","905295","904353","906217","905053","907092","905587","904772","904126","905423","904355","906242","905125","907105","905694","904873","904187","905499","904425","906401","905134","907166","905856"].map(id => ({id, room: "806", floor: "৮ম তলা"})),
+
+            // Room 807
+            ...["907229","905908","907986","906813","908474","907384","908730","908191","907245","905934","908006","906995","908643","907495","908825","908230","907398","906009","908208","907100","908647","907617","908865","908276","907512","906035","908232","907116","908700","907643","908882","908386","907573","906037","908240","907143","908709","907706","908961","908431","907684","906211","908426","907153","908711","907956","908971","908561","907690","906504","908468","907223","908721","907977","909035","908561"].map(id => ({id, room: "807", floor: "৮ম তলা"})),
+
+            // Room 808
+            ...["909098","908633","910030","908907","910324","909387","910652","909842","909347","908642","910158","908983","910471","909388","910666","909859","909351","908652","910196","909006","910481","909404","910768","909885","909652","908699","910205","909313","910514","909618","911004","909925","909666","908775","910232","909322","910546","909661","911073","909951","909760","908777","910300","909324","910616","909662","911235","910037","909813","908835","910319","909345","910640","909833","911394","910172"].map(id => ({id, room: "808", floor: "৮ম তলা"})),
+
+            // Room 811
+            ...["911596","910371","910785","911100","910535","910854","911368","910601","910873","911372","910608","910916","911557","910664","910943","911568","910688","910664","910966","911603"].map(id => ({id, room: "811", floor: "৮ম তলা"})),
+
+            // Room 812
+            ...["SC00004","SC00002","SC00020","SC00015","SC00039","SC00029","SC00023","SC00041","SC00008","SC00005","SC00021","SC00016","SC00001","SC00032","SC00025","SC00009","SC00007","SC00022","SC00024","SC00003","SC00034","SC00031","SC00013","SC00010","SC00030","SC00026","SC00006","SC00037","SC00035","SC00018","SC00012","SC00033","SC00027","SC00011","SC00038","SC00019","SC00014","SC00036","SC00028","SC00017","SC00040"].map(id => ({id, room: "812", floor: "৮ম তলা"}))
+        ];
+
+        function searchSeat() {
+            const input = document.getElementById('usernameInput').value.trim().toUpperCase();
+            const resultCard = document.getElementById('resultCard');
+            const errorCard = document.getElementById('errorCard');
+
+            resultCard.style.display = 'none';
+            errorCard.style.display = 'none';
+
+            if (!input) {
+                alert('অনুগ্রহ করে ইউজারনেম টাইপ করুন');
+                return;
+            }
+
+            const foundData = seatData.find(item => item.id.toUpperCase() === input);
+
+            if (foundData) {
+                document.getElementById('resUser').innerText = foundData.id;
+                document.getElementById('resFloor').innerText = foundData.floor;
+                document.getElementById('resRoom').innerText = foundData.room;
+                resultCard.style.display = 'block';
+            } else {
+                errorCard.style.display = 'block';
+            }
+        }
+
+        document.getElementById("usernameInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                searchSeat();
+            }
+        });
+    </script>
+</body>
+</html>
